@@ -53,4 +53,22 @@ trait Board {
     val rem = applyTransform(t)(first.filter(_.isDefined).reverse)
     List.fill(first.size - rem.size)(None) ++ rem.reverse
   }
+
+  object Move extends Enumeration {
+    type Move = Value
+    val Left,Up,Right,Down = Value
+  }
+  import Move._
+
+  def performMove(t: Transformation)(move: Move, board: Board): Option[Board] = {
+    val movedBoard = move match {
+      case Left => board.map(transformLeft(t))
+      case Up => board.transpose.map(transformLeft(t)).transpose
+      case Right => board.map(transformRight(t))
+      case Down => board.transpose.map(transformRight(t)).transpose
+    }
+    if (movedBoard == board) None else Some(movedBoard)
+  }
+
+
 }

@@ -117,4 +117,62 @@ class BoardSpec extends Specification {
     }
   }
 
+  "performMove" should {
+    val boardGood: Board = List(
+      List(Some(2), None,    Some(2)),
+      List(None,    Some(4), None),
+      List(None,    Some(4), None)
+    )
+    val boardBad: Board = List(
+      List(Some(1), Some(2), Some(4)),
+      List(Some(2), Some(4), Some(8)),
+      List(Some(4), Some(8), Some(16))
+    )
+    val mv = performMove(Transformation2048)_
+
+    "move left" in {
+      mv(Move.Left, boardGood) === Some(List(
+        List(Some(4), None, None),
+        List(Some(4), None, None),
+        List(Some(4), None, None)
+      ))
+    }
+    "stuck left" in {
+      mv(Move.Left, boardBad) === None
+    }
+
+    "move up" in {
+      mv(Move.Up, boardGood) === Some(List(
+        List(Some(2), Some(8), Some(2)),
+        List(None,    None,    None),
+        List(None,    None,    None)
+      ))
+    }
+    "stuck up" in {
+      mv(Move.Up, boardBad) === None
+    }
+
+    "move right" in {
+      mv(Move.Right, boardGood) === Some(List(
+        List(None, None, Some(4)),
+        List(None, None, Some(4)),
+        List(None, None, Some(4))
+      ))
+    }
+    "stuck right" in {
+      mv(Move.Right, boardBad) === None
+    }
+
+    "move down" in {
+      mv(Move.Down, boardGood) === Some(List(
+        List(None,    None,    None),
+        List(None,    None,    None),
+        List(Some(2), Some(8), Some(2))
+      ))
+    }
+    "stuck down" in {
+      mv(Move.Down, boardBad) === None
+    }
+  }
+
 }
