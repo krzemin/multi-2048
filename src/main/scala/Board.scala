@@ -1,4 +1,3 @@
-import scala.util.Random
 
 trait Board { self: Transformation with RandomGen =>
 
