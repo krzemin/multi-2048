@@ -1,5 +1,5 @@
 import scala.util.Random
 
 trait RandomGenFake extends RandomGen {
-  override val rand = new Random(0)
+  override lazy val rand = new Random(0)
 }
