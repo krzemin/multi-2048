@@ -1,11 +1,9 @@
 import scala.util.Random
 
-trait Board { self: Transformation =>
+trait Board { self: Transformation with RandomGen =>
 
   type Field = Option[Int]
   type Board = List[List[Field]]
-
-  val rand = new Random()
 
   def newBoard(size: Int, field: Field = None) = List.fill(size)(List.fill(size)(field))
 

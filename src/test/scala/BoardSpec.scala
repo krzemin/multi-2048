@@ -2,7 +2,7 @@ import org.specs2.mutable._
 
 class BoardSpec extends Specification {
 
-  object Test extends Board with Transformation2048
+  object Test extends Board with Transformation2048 with RandomGenFake
   import Test._
 
   val boardEmpty = newBoard(5)
