@@ -5,6 +5,8 @@ trait Board { self: Transformation with RandomGen =>
   type Field = Option[Int]
   type Board = List[List[Field]]
 
+  import Board.Move._
+
   def newBoard(size: Int, field: Field = None) = List.fill(size)(List.fill(size)(field))
 
   def isEmpty(x: Int, y: Int)(board: Board) = !board(y)(x).isDefined
@@ -44,12 +46,6 @@ trait Board { self: Transformation with RandomGen =>
     List.fill(first.size - rem.size)(None) ++ rem.reverse
   }
 
-  object Move extends Enumeration {
-    type Move = Value
-    val Left,Up,Right,Down = Value
-  }
-  import Move._
-
   def performMove(move: Move, board: Board): Option[Board] = {
     val movedBoard = move match {
       case Left => board.map(transformLeft)
@@ -60,7 +56,7 @@ trait Board { self: Transformation with RandomGen =>
     if (movedBoard == board) None else Some(movedBoard)
   }
 
-  def isBoardStuck(board: Board): Boolean = Move.values
+  def isBoardStuck(board: Board): Boolean = Board.Move.values
       .map(move => performMove(move, board))
       .forall(_ == None)
 
@@ -70,4 +66,11 @@ trait Board { self: Transformation with RandomGen =>
       case None => " ____"
   }.mkString).mkString("\n")
 
+}
+
+object Board {
+  object Move extends Enumeration {
+    type Move = Value
+    val Left,Up,Right,Down = Value
+  }
 }

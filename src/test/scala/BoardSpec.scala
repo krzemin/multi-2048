@@ -4,6 +4,7 @@ class BoardSpec extends Specification {
 
   object Test extends Board with Transformation2048 with RandomGenFake
   import Test._
+  import Board._
 
   val boardEmpty = newBoard(5)
   val boardFilled = newBoard(5, Some(1))
