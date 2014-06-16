@@ -34,25 +34,23 @@ trait Board {
   type ReduceOperation = (Int, Int) => Int
 
   trait Transformation {
-    val cond: ReduceCondition
-    val op: ReduceOperation
+    def cond: ReduceCondition
+    def op: ReduceOperation
   }
 
-  def fix[T](f:(T=>T)=>(T=>T)):T=>T = f((x:T) => fix(f)(x))
-
-  def applyLeft(t: Transformation)(f: List[Field] => List[Field])(row: List[Field]): List[Field] = row match {
-    case Some(h1) :: Some(h2) :: rest if t.cond(h1,h2) => f(Some(t.op(h1,h2)) :: rest)
-    case Some(h1) :: rest => Some(h1) :: f(rest)
+  def applyTransform(t: Transformation)(row: List[Field]): List[Field] = row match {
+    case Some(h1) :: Some(h2) :: rest if t.cond(h1,h2) => applyTransform(t)(Some(t.op(h1,h2)) :: rest)
+    case Some(h1) :: rest => Some(h1) :: applyTransform(t)(rest)
     case Nil => Nil
   }
 
   def transformLeft(t: Transformation)(first: List[Field]): List[Field] = {
-    val rem = fix(applyLeft(t))(first.filter(_.isDefined))
+    val rem = applyTransform(t)(first.filter(_.isDefined))
     rem ++ List.fill(first.size - rem.size)(None)
   }
 
   def transformRight(t: Transformation)(first: List[Field]): List[Field] = {
-    val rem = fix(applyLeft(t))(first.filter(_.isDefined).reverse)
+    val rem = applyTransform(t)(first.filter(_.isDefined).reverse)
     List.fill(first.size - rem.size)(None) ++ rem.reverse
   }
 }

@@ -76,25 +76,45 @@ class BoardSpec extends Specification {
   }
 
   "transformLeft" should {
-    val tr = transformLeft(Transformation2048)
+    val tl = transformLeft(Transformation2048)_
+    "leave empty row an empty row" in {
+      val emptyRow: List[Field] = List(None, None, None)
+      tl(emptyRow) === emptyRow
+    }
+    "add two numbers at the edge" in {
+      tl(List(Some(4), Some(4), None)) === List(Some(8), None, None)
+    }
+    "add two numbers at the opposite edge" in {
+      tl(List(None, Some(8), Some(8))) === List(Some(16), None, None)
+    }
+    "transform from left to right" in {
+      tl(List(Some(4), Some(2), Some(2))) === List(Some(4), Some(4), None)
+      tl(List(Some(2), Some(2), Some(4))) === List(Some(8), None, None)
+    }
+    "gravitate to the left" in {
+      tl(List(None, Some(4), None, Some(2), Some(1))) === List(Some(4), Some(2), Some(1), None, None)
+    }
+  }
+
+  "transformRight" should {
+    val tr = transformRight(Transformation2048)_
     "leave empty row an empty row" in {
       val emptyRow: List[Field] = List(None, None, None)
       tr(emptyRow) === emptyRow
     }
     "add two numbers at the edge" in {
-      tr(List(Some(4), Some(4), None)) === List(Some(8), None, None)
+      tr(List(None, Some(8), Some(8))) === List(None, None, Some(16))
     }
     "add two numbers at the opposite edge" in {
-      tr(List(None, Some(8), Some(8))) === List(Some(16), None, None)
+      tr(List(Some(4), Some(4), None)) === List(None, None, Some(8))
     }
-    "transform from left to right" in {
-      tr(List(Some(4), Some(2), Some(2))) === List(Some(4), Some(4), None)
+    "transform from right to left" in {
+      tr(List(Some(4), Some(2), Some(2))) === List(None, None, Some(8))
+      tr(List(Some(2), Some(2), Some(4))) === List(None, Some(4), Some(4))
     }
-    "gravitate to the left" in {
-      tr(List(None, Some(1), None, Some(2), Some(1))) === List(Some(1), Some(2), Some(1), None, None)
+    "gravitate to the right" in {
+      tr(List(None, Some(4), None, Some(2), Some(1))) === List(None, None, Some(4), Some(2), Some(1))
     }
   }
-
-
 
 }
