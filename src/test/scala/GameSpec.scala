@@ -18,14 +18,16 @@ class GameSpec extends Specification {
   "isEmpty" should {
     val board = emptyBoard(5)
     "be true on empty board" in {
-      for {
+      (for {
         x <- 0 until 5
         y <- 0 until 5
-      } isEmpty(x, y)(board) === true
+      } yield (x,y)).forall {
+        case (x,y) => isEmpty(x, y)(board) === true
+      }
     }
     "be false on occupied fields" in {
       val board1 = putBoard(3, 4, 1)(board)
-      isEmpty(3, 4)(board) === false
+      isEmpty(3, 4)(board1) === false
     }
   }
 
