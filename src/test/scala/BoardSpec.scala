@@ -1,11 +1,17 @@
 import org.specs2.mutable._
 
-class GameSpec extends Specification {
+class BoardSpec extends Specification {
 
-  import Game._
+  object Test extends Board
+  import Test._
 
   val boardEmpty = newBoard(5)
   val boardFilled = newBoard(5, Some(1))
+
+  object Transformation2048 extends Transformation {
+    def cond: ReduceCondition = (x1: Int, x2: Int) => x1 == x2
+    def op: ReduceOperation = (x1: Int, x2: Int) => x1 + x2
+  }
 
   "newBoard" should {
     "create board with specified size" in {
@@ -68,5 +74,27 @@ class GameSpec extends Specification {
       addRandomField(boardFilled) === boardFilled
     }
   }
+
+  "transformLeft" should {
+    val tr = transformLeft(Transformation2048)
+    "leave empty row an empty row" in {
+      val emptyRow: List[Field] = List(None, None, None)
+      tr(emptyRow) === emptyRow
+    }
+    "add two numbers at the edge" in {
+      tr(List(Some(4), Some(4), None)) === List(Some(8), None, None)
+    }
+    "add two numbers at the opposite edge" in {
+      tr(List(None, Some(8), Some(8))) === List(Some(16), None, None)
+    }
+    "transform from left to right" in {
+      tr(List(Some(4), Some(2), Some(2))) === List(Some(4), Some(4), None)
+    }
+    "gravitate to the left" in {
+      tr(List(None, Some(1), None, Some(2), Some(1))) === List(Some(1), Some(2), Some(1), None, None)
+    }
+  }
+
+
 
 }
