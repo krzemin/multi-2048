@@ -72,6 +72,15 @@ class BoardSpec extends Specification {
     }
   }
 
+  "scoreBoard" should {
+    "score empty board to 0" in {
+      scoreBoard(boardEmpty) === 0
+    }
+    "score filled board to 25" in {
+      scoreBoard(boardEmpty) === 25
+    }
+  }
+
   "transformLeft" should {
     "leave empty row an empty row" in {
       val emptyRow: List[Field] = List(None, None, None)

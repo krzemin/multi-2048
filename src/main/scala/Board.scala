@@ -30,6 +30,9 @@ trait Board { self: Transformation with RandomGen =>
     }
   }
 
+  def scoreBoard(board: Board): Int =
+    board.flatten.map(_.getOrElse(0)).sum
+
   def applyTransform(row: List[Field]): List[Field] = row match {
     case Some(h1) :: Some(h2) :: rest if cond(h1,h2) => applyTransform(Some(op(h1,h2)) :: rest)
     case Some(h1) :: rest => Some(h1) :: applyTransform(rest)
