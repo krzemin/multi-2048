@@ -13,8 +13,8 @@ class Game(size: Int) { self: Board =>
     } yield (m1, m2)
 
     nextBoards.fold(false)({ case (b1, b2) =>
-      board1 = b1
-      board2 = b2
+      board1 = addRandomField(b1)
+      board2 = addRandomField(b2)
       true
     })
   }
@@ -25,7 +25,8 @@ class Game(size: Int) { self: Board =>
     case (true, false) => Player2Won
     case (true, true) => Draw
   }
-  override def toString() = showBoard(board1) ++ "--------\n" ++ showBoard(board2)
+  override def toString() =
+    s"P1: ${scoreBoard(board1)}\n${showBoard(board1)}\nP2: ${scoreBoard(board2)}\n${showBoard(board2)}\nStatus: ${status}\n"
 }
 
 object Game {
