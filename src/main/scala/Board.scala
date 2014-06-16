@@ -1,6 +1,6 @@
 import scala.util.Random
 
-trait Board {
+trait Board { self: Transformation =>
 
   type Field = Option[Int]
   type Board = List[List[Field]]
@@ -30,27 +30,19 @@ trait Board {
     }
   }
 
-  type ReduceCondition = (Int, Int) => Boolean
-  type ReduceOperation = (Int, Int) => Int
-
-  trait Transformation {
-    def cond: ReduceCondition
-    def op: ReduceOperation
-  }
-
-  def applyTransform(t: Transformation)(row: List[Field]): List[Field] = row match {
-    case Some(h1) :: Some(h2) :: rest if t.cond(h1,h2) => applyTransform(t)(Some(t.op(h1,h2)) :: rest)
-    case Some(h1) :: rest => Some(h1) :: applyTransform(t)(rest)
+  def applyTransform(row: List[Field]): List[Field] = row match {
+    case Some(h1) :: Some(h2) :: rest if cond(h1,h2) => applyTransform(Some(op(h1,h2)) :: rest)
+    case Some(h1) :: rest => Some(h1) :: applyTransform(rest)
     case Nil => Nil
   }
 
-  def transformLeft(t: Transformation)(first: List[Field]): List[Field] = {
-    val rem = applyTransform(t)(first.filter(_.isDefined))
+  def transformLeft(first: List[Field]): List[Field] = {
+    val rem = applyTransform(first.filter(_.isDefined))
     rem ++ List.fill(first.size - rem.size)(None)
   }
 
-  def transformRight(t: Transformation)(first: List[Field]): List[Field] = {
-    val rem = applyTransform(t)(first.filter(_.isDefined).reverse)
+  def transformRight(first: List[Field]): List[Field] = {
+    val rem = applyTransform(first.filter(_.isDefined).reverse)
     List.fill(first.size - rem.size)(None) ++ rem.reverse
   }
 
@@ -60,15 +52,18 @@ trait Board {
   }
   import Move._
 
-  def performMove(t: Transformation)(move: Move, board: Board): Option[Board] = {
+  def performMove(move: Move, board: Board): Option[Board] = {
     val movedBoard = move match {
-      case Left => board.map(transformLeft(t))
-      case Up => board.transpose.map(transformLeft(t)).transpose
-      case Right => board.map(transformRight(t))
-      case Down => board.transpose.map(transformRight(t)).transpose
+      case Left => board.map(transformLeft)
+      case Up => board.transpose.map(transformLeft).transpose
+      case Right => board.map(transformRight)
+      case Down => board.transpose.map(transformRight).transpose
     }
     if (movedBoard == board) None else Some(movedBoard)
   }
 
+  def isBoardStuck(board: Board): Boolean = Move.values
+      .map(move => performMove(move, board))
+      .forall(_ == None)
 
 }

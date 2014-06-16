@@ -2,16 +2,17 @@ import org.specs2.mutable._
 
 class BoardSpec extends Specification {
 
-  object Test extends Board
+  trait Transformation2048 extends Transformation {
+    def cond: ReduceCondition = (x1: Int, x2: Int) => x1 == x2
+    def op: ReduceOperation = (x1: Int, x2: Int) => x1 + x2
+  }
+
+  object Test extends Board with Transformation2048
   import Test._
 
   val boardEmpty = newBoard(5)
   val boardFilled = newBoard(5, Some(1))
 
-  object Transformation2048 extends Transformation {
-    def cond: ReduceCondition = (x1: Int, x2: Int) => x1 == x2
-    def op: ReduceOperation = (x1: Int, x2: Int) => x1 + x2
-  }
 
   "newBoard" should {
     "create board with specified size" in {
@@ -76,44 +77,42 @@ class BoardSpec extends Specification {
   }
 
   "transformLeft" should {
-    val tl = transformLeft(Transformation2048)_
     "leave empty row an empty row" in {
       val emptyRow: List[Field] = List(None, None, None)
-      tl(emptyRow) === emptyRow
+      transformLeft(emptyRow) === emptyRow
     }
     "add two numbers at the edge" in {
-      tl(List(Some(4), Some(4), None)) === List(Some(8), None, None)
+      transformLeft(List(Some(4), Some(4), None)) === List(Some(8), None, None)
     }
     "add two numbers at the opposite edge" in {
-      tl(List(None, Some(8), Some(8))) === List(Some(16), None, None)
+      transformLeft(List(None, Some(8), Some(8))) === List(Some(16), None, None)
     }
     "transform from left to right" in {
-      tl(List(Some(4), Some(2), Some(2))) === List(Some(4), Some(4), None)
-      tl(List(Some(2), Some(2), Some(4))) === List(Some(8), None, None)
+      transformLeft(List(Some(4), Some(2), Some(2))) === List(Some(4), Some(4), None)
+      transformLeft(List(Some(2), Some(2), Some(4))) === List(Some(8), None, None)
     }
     "gravitate to the left" in {
-      tl(List(None, Some(4), None, Some(2), Some(1))) === List(Some(4), Some(2), Some(1), None, None)
+      transformLeft(List(None, Some(4), None, Some(2), Some(1))) === List(Some(4), Some(2), Some(1), None, None)
     }
   }
 
   "transformRight" should {
-    val tr = transformRight(Transformation2048)_
     "leave empty row an empty row" in {
       val emptyRow: List[Field] = List(None, None, None)
-      tr(emptyRow) === emptyRow
+      transformRight(emptyRow) === emptyRow
     }
     "add two numbers at the edge" in {
-      tr(List(None, Some(8), Some(8))) === List(None, None, Some(16))
+      transformRight(List(None, Some(8), Some(8))) === List(None, None, Some(16))
     }
     "add two numbers at the opposite edge" in {
-      tr(List(Some(4), Some(4), None)) === List(None, None, Some(8))
+      transformRight(List(Some(4), Some(4), None)) === List(None, None, Some(8))
     }
     "transform from right to left" in {
-      tr(List(Some(4), Some(2), Some(2))) === List(None, None, Some(8))
-      tr(List(Some(2), Some(2), Some(4))) === List(None, Some(4), Some(4))
+      transformRight(List(Some(4), Some(2), Some(2))) === List(None, None, Some(8))
+      transformRight(List(Some(2), Some(2), Some(4))) === List(None, Some(4), Some(4))
     }
     "gravitate to the right" in {
-      tr(List(None, Some(4), None, Some(2), Some(1))) === List(None, None, Some(4), Some(2), Some(1))
+      transformRight(List(None, Some(4), None, Some(2), Some(1))) === List(None, None, Some(4), Some(2), Some(1))
     }
   }
 
@@ -128,50 +127,49 @@ class BoardSpec extends Specification {
       List(Some(2), Some(4), Some(8)),
       List(Some(4), Some(8), Some(16))
     )
-    val mv = performMove(Transformation2048)_
 
     "move left" in {
-      mv(Move.Left, boardGood) === Some(List(
+      performMove(Move.Left, boardGood) === Some(List(
         List(Some(4), None, None),
         List(Some(4), None, None),
         List(Some(4), None, None)
       ))
     }
     "stuck left" in {
-      mv(Move.Left, boardBad) === None
+      performMove(Move.Left, boardBad) === None
     }
 
     "move up" in {
-      mv(Move.Up, boardGood) === Some(List(
+      performMove(Move.Up, boardGood) === Some(List(
         List(Some(2), Some(8), Some(2)),
         List(None,    None,    None),
         List(None,    None,    None)
       ))
     }
     "stuck up" in {
-      mv(Move.Up, boardBad) === None
+      performMove(Move.Up, boardBad) === None
     }
 
     "move right" in {
-      mv(Move.Right, boardGood) === Some(List(
+      performMove(Move.Right, boardGood) === Some(List(
         List(None, None, Some(4)),
         List(None, None, Some(4)),
         List(None, None, Some(4))
       ))
     }
     "stuck right" in {
-      mv(Move.Right, boardBad) === None
+      performMove(Move.Right, boardBad) === None
     }
 
     "move down" in {
-      mv(Move.Down, boardGood) === Some(List(
+      performMove(Move.Down, boardGood) === Some(List(
         List(None,    None,    None),
         List(None,    None,    None),
         List(Some(2), Some(8), Some(2))
       ))
     }
     "stuck down" in {
-      mv(Move.Down, boardBad) === None
+      performMove(Move.Down, boardBad) === None
     }
   }
 
