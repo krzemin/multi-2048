@@ -168,5 +168,13 @@ class BoardSpec extends Specification {
     }
   }
 
+  "isBoardStuck" should {
+    "return false on in-game boards" in {
+      isBoardStuck(boardFilled) === false
+    }
+    "return true on stuck boards" in {
+      isBoardStuck(boardEmpty) === true
+    }
+  }
 
 }
