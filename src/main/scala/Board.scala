@@ -66,4 +66,10 @@ trait Board { self: Transformation =>
       .map(move => performMove(move, board))
       .forall(_ == None)
 
+  def showBoard(board: Board): String =
+    board.map(_.map {
+      case Some(n) => f"$n% 5d"
+      case None => " ____"
+  }.mkString).mkString("\n")
+
 }

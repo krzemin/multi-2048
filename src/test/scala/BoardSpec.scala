@@ -177,4 +177,23 @@ class BoardSpec extends Specification {
     }
   }
 
+  "showBoard" should {
+    "show empty board" in {
+      showBoard(boardEmpty) ===
+        """ ____ ____ ____ ____ ____
+          | ____ ____ ____ ____ ____
+          | ____ ____ ____ ____ ____
+          | ____ ____ ____ ____ ____
+          | ____ ____ ____ ____ ____""".stripMargin
+    }
+    "show filled board" in {
+      showBoard(boardFilled) ===
+        """    1    1    1    1    1
+          |    1    1    1    1    1
+          |    1    1    1    1    1
+          |    1    1    1    1    1
+          |    1    1    1    1    1""".stripMargin
+    }
+  }
+
 }
