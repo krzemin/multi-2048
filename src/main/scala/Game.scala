@@ -1,13 +1,35 @@
+import scala.util.Random
 
 object Game {
 
   type Field = Option[Int]
   type Board = List[List[Field]]
 
-  def emptyBoard(size: Int) = List.fill(size)(List.fill(size)(None))
+  val rand = new Random()
+
+  def newBoard(size: Int, field: Field = None) = List.fill(size)(List.fill(size)(field))
+
   def isEmpty(x: Int, y: Int)(board: Board) = !board(y)(x).isDefined
+
   def putBoard(x: Int, y: Int, what: Int)(board: Board) =
     board.updated(y, board(y).updated(x, Some(what)))
+
+  def freeFields(board: Board): List[(Int,Int)] = (for {
+      x <- 0 until board.size
+      y <- 0 until board.size
+      if isEmpty(x,y)(board)
+    } yield (x,y)).toList
+
+  def addRandomField(board: Board): Board = {
+    freeFields(board) match {
+      case Nil => board
+      case available =>
+        val (addX, addY) = available(rand.nextInt(available.size))
+        val randVal = (rand.nextInt(1) + 1) * 2
+        putBoard(addX, addY, randVal)(board)
+    }
+  }
+
 
   type ReduceCondition = (Int, Int) => Boolean
   type ReduceOperation = (Int, Int) => Int
