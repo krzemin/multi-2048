@@ -2,4 +2,5 @@
 project/project
 project/target
 scalajvm/target
+scalajs/target
 scala/target
