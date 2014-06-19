@@ -2,6 +2,6 @@
 project/project
 project/target
 scalajvm/target
-scalajvm/logs
+scalajvm/logs/*
 scalajs/target
 scala/target
