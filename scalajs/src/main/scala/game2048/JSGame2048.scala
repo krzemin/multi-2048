@@ -1,5 +1,7 @@
 package game2048
 
+import org.scalajs.dom.{Event, MessageEvent, WebSocket}
+
 import scala.scalajs.js
 import org.scalajs.dom
 import org.scalajs.dom.extensions._
@@ -8,6 +10,19 @@ import js.Dynamic.{ global => g }
 object JSGame2048 extends js.JSApp {
 
   def main(): Unit = {
+
+    val wsUri = "ws://localhost:9000/ws"
+    val websocket = new WebSocket(wsUri)
+
+    websocket.onmessage = (evt: MessageEvent) => {
+      println(evt)
+      println(evt.data)
+    }
+
+    websocket.onopen = { evt: Event =>
+      websocket.send("Kupa z dupy")
+    }
+
 
 
     val canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
@@ -88,9 +103,4 @@ object JSGame2048 extends js.JSApp {
     }, false)
 
   }
-
-  /** Computes the square of an integer.
-   *  This demonstrates unit testing.
-   */
-  def square(x: Int): Int = x*x
 }
