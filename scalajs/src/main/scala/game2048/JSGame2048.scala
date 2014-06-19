@@ -38,8 +38,16 @@ object JSGame2048 extends js.JSApp {
       def renderStatus(g: Game) {
         ctx.font = "22px monospace"
         ctx.fillStyle = "rgb(20,60,150)"
-        val status = s"${g.score1}     ${g.status.toString}     ${g.score2}"
-        ctx.fillText(status, canvas.width / 2, 408 + 12)
+        ctx.fillText(g.score1 + (" " * 30) + g.score2, canvas.width / 2, 408 + 12)
+
+        if(g.status != Game.Status.InProgress) {
+          ctx.fillStyle = "rgb(220, 120, 20)"
+          ctx.fillRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2)
+
+          ctx.font = "bold 40px monospace"
+          ctx.fillStyle = "black"
+          ctx.fillText(g.status.toString, canvas.width / 2, canvas.height / 2)
+        }
       }
 
       def renderBoard(x: Int, y: Int, w: Int, h: Int, board: Board) {
