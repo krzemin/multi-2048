@@ -11,6 +11,9 @@ object JSGame2048 extends js.JSApp {
 
 
     val canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
+    canvas.style.margin = "0px auto"
+    canvas.style.marginTop = "40px"
+    canvas.style.display = "block"
     val ctx = canvas.getContext("2d").cast[dom.CanvasRenderingContext2D]
 
     canvas.width = 812
