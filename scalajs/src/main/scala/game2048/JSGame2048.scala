@@ -98,6 +98,7 @@ object JSGame2048 extends js.JSApp {
         case 38 => game.move(Up)
         case 39 => game.move(Right)
         case 40 => game.move(Down)
+        case _  =>
       }
       game.render()
     }, false)
