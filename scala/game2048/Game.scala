@@ -21,14 +21,15 @@ class Game(size: Int) { self: Board with GameRenderer =>
     })
   }
 
-  def availableMoves = ???
+  def availableMoves: List[Move] =
+    Board.Move.values.toList
+      .map(move => (move, performMove(move, board1), performMove(move, board2)))
+      .filter(p => p._2.isDefined && p._3.isDefined)
+      .map(_._1)
 
   def status: Status = (isBoardStuck(board1), isBoardStuck(board2)) match {
     case (false, false) =>
-      Board.Move.values
-        .map(move => (performMove(move, board1), performMove(move, board2)))
-        .filter(p => p._1.isDefined && p._2.isDefined)
-        .isEmpty match {
+      availableMoves.isEmpty match {
         case true => Draw
         case false => InProgress
       }
