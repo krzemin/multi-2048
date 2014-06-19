@@ -26,7 +26,14 @@ class Game(size: Int) { self: Board with GameRenderer =>
   }
 
   def status: Status = (isBoardStuck(board1), isBoardStuck(board2)) match {
-    case (false, false) => InProgress
+    case (false, false) =>
+      Board.Move.values
+        .map(move => (performMove(move, board1), performMove(move, board2)))
+        .filter(p => p._1.isDefined && p._2.isDefined)
+        .isEmpty match {
+        case true => Draw
+        case false => InProgress
+      }
     case (false, true) => Player1Won
     case (true, false) => Player2Won
     case (true, true) => Draw
