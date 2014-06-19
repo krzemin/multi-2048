@@ -9,15 +9,15 @@ class GameSpec extends Specification {
 
   "Game" should {
     "claim in-progress status for new game" in {
-      val game = new Game(4) with Board with Transformation2048 with RandomGenFake
+      val game = new Game(4) with Board with Transformation2048 with RandomGenFake with GameRenderer
       game.status === InProgress
     }
     "claim new 1x1 size game to be draw" in {
-      val game = new Game(1) with Board with Transformation2048 with RandomGenFake
+      val game = new Game(1) with Board with Transformation2048 with RandomGenFake with GameRenderer
       game.status === Draw
     }
     "play game2048 game" in {
-      val game = new Game(3) with Board with Transformation2048 with RandomGenFake
+      val game = new Game(3) with Board with Transformation2048 with RandomGenFake with GameRenderer
 
       game.move(Left) === true // P1
       game.move(Down) === true // P2

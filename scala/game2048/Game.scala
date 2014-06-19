@@ -1,6 +1,10 @@
 package game2048
 
-class Game(size: Int) { self: Board =>
+trait GameRenderer {
+  def renderGame(g: Game): Unit = {}
+}
+
+class Game(size: Int) { self: Board with GameRenderer =>
 
   var board1 = addRandomField(newBoard(size))
   var board2 = addRandomField(newBoard(size))
@@ -27,6 +31,9 @@ class Game(size: Int) { self: Board =>
     case (true, false) => Player2Won
     case (true, true) => Draw
   }
+
+  def render() = renderGame(self)
+
   override def toString() =
     s"P1: ${scoreBoard(board1)}\n${showBoard(board1)}\nP2: ${scoreBoard(board2)}\n${showBoard(board2)}\nStatus: ${status}\n"
 }
