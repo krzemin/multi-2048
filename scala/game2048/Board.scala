@@ -1,3 +1,4 @@
+package game2048
 
 trait Board { self: Transformation with RandomGen =>
 

@@ -1,3 +1,4 @@
+package game2048
 
 trait Transformation {
   type ReduceCondition = (Int, Int) => Boolean

@@ -1,3 +1,5 @@
+package game2048
+
 import org.specs2.mutable._
 
 class BoardSpec extends Specification {

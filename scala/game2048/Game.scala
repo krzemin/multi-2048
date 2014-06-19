@@ -1,3 +1,5 @@
+package game2048
+
 class Game(size: Int) { self: Board =>
 
   var board1 = addRandomField(newBoard(size))
