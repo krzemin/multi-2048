@@ -1,9 +1,5 @@
 package game2048
 
-trait GameRenderer {
-  def renderGame(g: Game): Unit = {}
-}
-
 class Game(size: Int) { self: Board with GameRenderer =>
 
   var board1 = addRandomField(newBoard(size))
@@ -24,6 +20,8 @@ class Game(size: Int) { self: Board with GameRenderer =>
       true
     })
   }
+
+  def availableMoves = ???
 
   def status: Status = (isBoardStuck(board1), isBoardStuck(board2)) match {
     case (false, false) =>
