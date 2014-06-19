@@ -14,7 +14,7 @@ class GameSpec extends Specification {
       val game = new Game(1) with Board with Transformation2048 with RandomGenFake
       game.status === Draw
     }
-    "play example game" in {
+    "play game2048 game" in {
       val game = new Game(3) with Board with Transformation2048 with RandomGenFake
 
       game.move(Left) === true // P1

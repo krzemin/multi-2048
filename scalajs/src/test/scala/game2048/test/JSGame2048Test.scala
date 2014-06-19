@@ -1,16 +1,16 @@
-package example
+package game2048
 package test
 
 import scala.scalajs.js
 import js.Dynamic.{ global => g }
 import scala.scalajs.test.JasmineTest
 
-object ScalaJSExampleTest extends JasmineTest {
+object JSGame2048Test extends JasmineTest {
 
-  describe("ScalaJSExample") {
+  describe("JSGame2048") {
 
     it("should implement square()") {
-      import ScalaJSExample._
+      import JSGame2048._
 
       expect(square(0)).toBe(0)
       expect(square(4)).toBe(16)
