@@ -3,6 +3,7 @@ package game2048
 import scala.scalajs.js
 import org.scalajs.dom
 import org.scalajs.dom.extensions._
+import js.Dynamic.{ global => g }
 
 object JSGame2048 extends js.JSApp {
 
@@ -13,7 +14,7 @@ object JSGame2048 extends js.JSApp {
     val ctx = canvas.getContext("2d").cast[dom.CanvasRenderingContext2D]
 
     canvas.width = 812
-    canvas.height = 408
+    canvas.height = 438
     dom.document.body.appendChild(canvas)
 
     val game = new Game(4) with Board with Transformation2048 with RandomGen with GameRenderer {
@@ -23,10 +24,19 @@ object JSGame2048 extends js.JSApp {
         ctx.fillStyle = "rgb(130,170,190)"
         ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+
         renderBoard(4, 4, brdW, brdH, g.board1)
         renderBoard(brdW+8, 4, brdW, brdH, g.board2)
+        renderStatus(g)
+      }
 
-        println(g)
+      def renderStatus(g: Game) {
+        ctx.font = "22px monospace"
+        ctx.fillStyle = "rgb(20,60,150)"
+        val status = s"${g.score1}     ${g.status.toString}     ${g.score2}"
+        ctx.fillText(status, canvas.width / 2, 408 + 12)
       }
 
       def renderBoard(x: Int, y: Int, w: Int, h: Int, board: Board) {
@@ -43,10 +53,8 @@ object JSGame2048 extends js.JSApp {
             ctx.fillRect(cellX, cellY, cellW - 2, cellH - 2)
 
             cell.foreach { case number =>
-              ctx.font = s"${3*cellH/4}px monospace"
+              ctx.font = s"bold ${cellH/3}px monospace"
               ctx.fillStyle = "rgb(90,20,10)"
-              ctx.textAlign = "center"
-              ctx.textBaseline = "middle"
               ctx.fillText(number.toString, cellX + cellW / 2, cellY + cellH / 2)
             }
 
@@ -57,10 +65,16 @@ object JSGame2048 extends js.JSApp {
 
     game.render()
 
-    game.move(Board.Move.Up)
-
-    game.render()
-
+    g.addEventListener("keydown", (e: dom.KeyboardEvent) => {
+      import Board.Move._
+      e.keyCode match {
+        case 37 => game.move(Left)
+        case 38 => game.move(Up)
+        case 39 => game.move(Right)
+        case 40 => game.move(Down)
+      }
+      game.render()
+    }, false)
 
   }
 

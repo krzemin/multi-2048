@@ -32,6 +32,9 @@ class Game(size: Int) { self: Board with GameRenderer =>
     case (true, true) => Draw
   }
 
+  def score1: Int = scoreBoard(board1)
+  def score2: Int = scoreBoard(board2)
+
   def render() = renderGame(self)
 
   override def toString() =
