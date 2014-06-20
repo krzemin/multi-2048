@@ -7,23 +7,34 @@ import org.scalajs.dom
 import org.scalajs.dom.extensions._
 import js.Dynamic.{ global => g }
 
+import org.scalajs.spickling._
+import org.scalajs.spickling.jsany._
+import actors._
+
 object JSGame2048 extends js.JSApp {
 
   def main(): Unit = {
+
+    PicklerRegistry.register[String]
+    PicklerRegistry.register[TestValue]
 
     val wsUri = "ws://localhost:9000/ws"
     val websocket = new WebSocket(wsUri)
 
     websocket.onmessage = (evt: MessageEvent) => {
-      println(evt)
       println(evt.data)
+      val obj: js.Any = js.JSON.parse(evt.data.asInstanceOf[js.String]).asInstanceOf[js.Any]
+      val unpickle: Any = PicklerRegistry.unpickle(obj)
+      println(unpickle.asInstanceOf[TestValue])
     }
 
     websocket.onopen = { evt: Event =>
-      websocket.send("Kupa z dupy")
+      val msg = TestValue("to jest test string zagnieżdżony w TestValue")
+      val pickle: js.Any = PicklerRegistry.pickle(msg)
+      val pickleStr = js.JSON.stringify(pickle)
+      println(s"sending: $pickleStr")
+      websocket.send(pickleStr)
     }
-
-
 
     val canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     canvas.style.margin = "0px auto"
