@@ -38,6 +38,9 @@ object ApplicationBuild extends Build with UniversalKeys {
       dist <<= dist dependsOn (fullOptJS in (scalajs, Compile)),
       addSharedSrcSetting,
       libraryDependencies ++= Dependencies.scalajvm,
+      resolvers += Resolver.url("scala-js-releases",
+        url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(
+          Resolver.ivyStylePatterns),
       EclipseKeys.skipParents in ThisBuild := false
     ) ++ (
       // ask scalajs project to put its outputs in scalajsOutputDir
@@ -54,6 +57,9 @@ object ApplicationBuild extends Build with UniversalKeys {
       persistLauncher := true,
       persistLauncher in Test := false,
       libraryDependencies ++= Dependencies.scalajs,
+      resolvers += Resolver.url("scala-js-releases",
+        url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(
+          Resolver.ivyStylePatterns),
       addSharedSrcSetting
     )
 
@@ -68,11 +74,16 @@ object ApplicationBuild extends Build with UniversalKeys {
 }
 
 object Dependencies {
-  val scalajvm = Seq()
+  val scalajvm = Seq(
+    "org.scalajs" %% "scalajs-pickling-play-json" % "0.3.1"
+  )
 
   val scalajs = Seq(
     "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % Versions.scalajsDom,
-    "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test"
+    "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6",
+    "org.scalajs" %%% "scalajs-pickling" % "0.3.1",
+    "org.scala-lang.modules.scalajs" %% "scalajs-jasmine-test-framework" % scalaJSVersion % "test",
+    "com.typesafe.akka" %% "akka-actor" % "2.3.3"
   )
 }
 
