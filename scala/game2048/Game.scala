@@ -2,11 +2,18 @@ package game2048
 
 class Game(size: Int) { self: Transformation with RandomGen with GameRenderer =>
 
-  var board1 = Board(size).addRandomField(rand)
-  var board2 = Board(size).addRandomField(rand)
-
   import Game.Status._
   import Board.Move._
+
+  require(size > 1)
+
+  var board1: Board = Board(size).addRandomField(rand)
+  var board2: Board = Board(size).addRandomField(rand)
+
+  while (status != InProgress) {
+    board1 = Board(size).addRandomField(rand)
+    board2 = Board(size).addRandomField(rand)
+  }
 
   def move(move: Move): Boolean = {
     val nextBoards = for {

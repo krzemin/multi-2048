@@ -14,7 +14,9 @@ class GameSpec extends Specification {
     }
 
     "claim new 1x1 size game to be draw" in {
-      val game = new Game(1) with Transformation2048 with RandomGenFake with GameRenderer
+      val game = new Game(2) with Transformation2048 with RandomGenFake with GameRenderer
+      game.board1 = new Board(2, List(List(Some(1), Some(2)), List(Some(4), Some(8))))
+      game.board2 = new Board(2, List(List(Some(1), Some(2)), List(Some(4), Some(8))))
       game.status === Draw
     }
 
