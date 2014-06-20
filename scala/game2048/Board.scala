@@ -1,79 +1,76 @@
 package game2048
 
-trait Board { self: Transformation with RandomGen =>
+import scala.util.Random
 
-  type Field = Option[Int]
-  type Board = List[List[Field]]
+case class Board(size: Int, fields: List[List[Option[Int]]]) {
+  import Board._
+  import Move._
 
-  import Board.Move._
+  def isEmpty(x: Int, y: Int) = !fields(y)(x).isDefined
 
-  def newBoard(size: Int, field: Field = None) = List.fill(size)(List.fill(size)(field))
+  def put(x: Int, y: Int, what: Int) =
+    new Board(size, fields.updated(y, fields(y).updated(x, Some(what))))
 
-  def isEmpty(x: Int, y: Int)(board: Board) = !board(y)(x).isDefined
+  def freeFields: List[(Int, Int)] = (for {
+    x <- 0 until size
+    y <- 0 until size
+    if isEmpty(x, y)
+  } yield (x, y)).toList
 
-  def putBoard(x: Int, y: Int, what: Int)(board: Board) =
-    board.updated(y, board(y).updated(x, Some(what)))
+  def addRandomField(rand: Random): Board = freeFields match {
+    case Nil => this
+    case available =>
+      val (addX, addY) = available(rand.nextInt(available.size))
+      val randVal = (rand.nextInt(1) + 1) * 2
+      put(addX, addY, randVal)
+  }
 
-  def freeFields(board: Board): List[(Int,Int)] = (for {
-      x <- 0 until board.size
-      y <- 0 until board.size
-      if isEmpty(x,y)(board)
-    } yield (x,y)).toList
+  def score: Int = fields.flatten.map(_.getOrElse(0)).sum
 
-  def addRandomField(board: Board): Board = {
-    freeFields(board) match {
-      case Nil => board
-      case available =>
-        val (addX, addY) = available(rand.nextInt(available.size))
-        val randVal = (rand.nextInt(1) + 1) * 2
-        putBoard(addX, addY, randVal)(board)
+
+  def performMove(t: Transformation)(move: Move): Option[Board] = {
+    val newFields = move match {
+      case Left => fields.map(transformLeft(t))
+      case Up => fields.transpose.map(transformLeft(t)).transpose
+      case Right => fields.map(transformRight(t))
+      case Down => fields.transpose.map(transformRight(t)).transpose
     }
+    if (newFields == fields) None else Some(new Board(size, newFields))
   }
 
-  def scoreBoard(board: Board): Int =
-    board.flatten.map(_.getOrElse(0)).sum
+  def isStuck(t: Transformation): Boolean = Board.Move.values
+    .map(move => performMove(t)(move))
+    .forall(_ == None)
 
-  def applyTransform(row: List[Field]): List[Field] = row match {
-    case Some(h1) :: Some(h2) :: rest if cond(h1,h2) => applyTransform(Some(op(h1,h2)) :: rest)
-    case Some(h1) :: rest => Some(h1) :: applyTransform(rest)
-    case Nil => Nil
-  }
-
-  def transformLeft(first: List[Field]): List[Field] = {
-    val rem = applyTransform(first.filter(_.isDefined))
-    rem ++ List.fill(first.size - rem.size)(None)
-  }
-
-  def transformRight(first: List[Field]): List[Field] = {
-    val rem = applyTransform(first.filter(_.isDefined).reverse)
-    List.fill(first.size - rem.size)(None) ++ rem.reverse
-  }
-
-  def performMove(move: Move, board: Board): Option[Board] = {
-    val movedBoard = move match {
-      case Left => board.map(transformLeft)
-      case Up => board.transpose.map(transformLeft).transpose
-      case Right => board.map(transformRight)
-      case Down => board.transpose.map(transformRight).transpose
-    }
-    if (movedBoard == board) None else Some(movedBoard)
-  }
-
-  def isBoardStuck(board: Board): Boolean = Board.Move.values
-      .map(move => performMove(move, board))
-      .forall(_ == None)
-
-  def showBoard(board: Board): String =
-    board.map(_.map {
+  override def toString: String =
+    fields.map(_.map {
       case Some(n) => f"$n% 5d"
       case None => " ____"
-  }.mkString).mkString("\n")
-
+    }.mkString).mkString("\n")
 }
 
 object Board {
+  def apply(size: Int, field: Option[Int] = None): Board =
+    new Board(size, List.fill(size)(List.fill(size)(field)))
+
+  def applyTransform(t: Transformation)(row: List[Option[Int]]): List[Option[Int]] = row match {
+    case Some(h1) :: Some(h2) :: rest if t.cond(h1, h2) => applyTransform(t)(Some(t.op(h1, h2)) :: rest)
+    case Some(h1) :: rest => Some(h1) :: applyTransform(t)(rest)
+    case Nil => Nil
+  }
+
+  def transformLeft(t: Transformation)(first: List[Option[Int]]): List[Option[Int]] = {
+    val rem = applyTransform(t)(first.filter(_.isDefined))
+    rem ++ List.fill(first.size - rem.size)(None)
+  }
+
+  def transformRight(t: Transformation)(first: List[Option[Int]]): List[Option[Int]] = {
+    val rem = applyTransform(t)(first.filter(_.isDefined).reverse)
+    List.fill(first.size - rem.size)(None) ++ rem.reverse
+  }
+
   object Move extends Enumeration {
     type Move = Value
-    val Left,Up,Right,Down = Value
+    val Left, Up, Right, Down = Value
   }
 }

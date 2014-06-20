@@ -9,28 +9,28 @@ class GameSpec extends Specification {
 
   "Game" should {
     "claim in-progress status for new game" in {
-      val game = new Game(4) with Board with Transformation2048 with RandomGenFake with GameRenderer
+      val game = new Game(4) with Transformation2048 with RandomGenFake with GameRenderer
       game.status === InProgress
     }
 
     "claim new 1x1 size game to be draw" in {
-      val game = new Game(1) with Board with Transformation2048 with RandomGenFake with GameRenderer
+      val game = new Game(1) with Transformation2048 with RandomGenFake with GameRenderer
       game.status === Draw
     }
 
     "terminate when boards are not stuck, but there is no single move which modifies them" in {
-      val game = new Game(2) with Board with Transformation2048 with RandomGenFake with GameRenderer {
-        board1 = List(List(Some(2), Some(4)),
-                      List(Some(8), None))
-        board2 = List(List(None,    Some(4)),
-                      List(Some(8), Some(16)))
+      val game = new Game(2) with Transformation2048 with RandomGenFake with GameRenderer {
+        board1 = new Board(2, List(List(Some(2), Some(4)),
+                                   List(Some(8), None)))
+        board2 = new Board(2, List(List(None,    Some(4)),
+                                   List(Some(8), Some(16))))
       }
 
       game.status === Draw
     }
 
     "play game2048 game" in {
-      val game = new Game(3) with Board with Transformation2048 with RandomGenFake with GameRenderer
+      val game = new Game(3) with Transformation2048 with RandomGenFake with GameRenderer
 
       game.move(Left) === true // P1
       game.move(Down) === true // P2

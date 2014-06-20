@@ -35,7 +35,7 @@ object JSGame2048 extends js.JSApp {
     canvas.height = 438
     dom.document.body.appendChild(canvas)
 
-    val game = new Game(4) with Board with Transformation2048 with RandomGen with GameRenderer {
+    val game = new Game(4) with Transformation2048 with RandomGen with GameRenderer {
       override def renderGame(g: Game) {
         val (brdW, brdH) = (400, 400)
 
@@ -68,10 +68,9 @@ object JSGame2048 extends js.JSApp {
       def renderBoard(x: Int, y: Int, w: Int, h: Int, board: Board) {
         val size = board.size
         val (cellW, cellH) = (w / size, h / size)
-        val idxBoard = board.map(_.zipWithIndex).zipWithIndex
+        val idxFields = board.fields.map(_.zipWithIndex).zipWithIndex
 
-
-        idxBoard.foreach { case (row, j) =>
+        idxFields.foreach { case (row, j) =>
           row.foreach { case (cell, i) =>
             ctx.fillStyle = "rgb(190,240,140)"
             val (cellX, cellY) = (x + cellW * i + 1, y + cellH * j + 1)
