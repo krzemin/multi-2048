@@ -16,17 +16,32 @@ object JSGame2048 extends js.JSApp {
 
   def main(): Unit = {
 
-    PicklerRegistry.register(WantPlayHuman)
-    PicklerRegistry.register(WantPlayAI)
-    PicklerRegistry.register[Board]
-    PicklerRegistry.register(None)
-    PicklerRegistry.register[Some[Any]]
-    PicklerRegistry.register(Nil)
-    PicklerRegistry.register[::[Any]]
-    PicklerRegistry.register[NewGame]
-    PicklerRegistry.register[StateUpdate]
-    PicklerRegistry.register[PerformMove]
-    PicklerRegistry.register[TestValue]
+    object PicklingHelper {
+      def registerTypes() {
+        PicklerRegistry.register(WantPlayHuman)
+        PicklerRegistry.register(WantPlayAI)
+        PicklerRegistry.register[Board]
+        PicklerRegistry.register(None)
+        PicklerRegistry.register[Some[Any]]
+        PicklerRegistry.register(Nil)
+        PicklerRegistry.register[::[Any]]
+        PicklerRegistry.register[NewGame]
+        PicklerRegistry.register[StateUpdate]
+        PicklerRegistry.register[Move]
+        PicklerRegistry.register[PerformMove]
+      }
+    }
+
+
+    def pickle(msg: Any): Any = {
+      val pickled: js.Any = PicklerRegistry.pickle(msg)
+      js.JSON.stringify(pickled)
+    }
+
+    def unpickle(buffer: Any): Any = {
+      val obj: js.Any = js.JSON.parse(buffer.asInstanceOf[js.String]).asInstanceOf[js.Any]
+      PicklerRegistry.unpickle()
+    }
 
     val wsUri = "ws://localhost:9000/ws"
     val websocket = new WebSocket(wsUri)
