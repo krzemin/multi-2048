@@ -14,13 +14,12 @@ import actors._
 
 object JSGame2048 extends js.JSApp {
 
+  val wsUri = "ws://localhost:9000/ws"
+
   def main(): Unit = {
 
     val startButton = jQuery("<button>Start</button>").attr("disabled", "disabled")
     jQuery("body").append(startButton)
-
-
-    val wsUri = "ws://localhost:9000/ws"
 
     val canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     canvas.style.margin = "0px auto"
@@ -106,18 +105,21 @@ object JSGame2048 extends js.JSApp {
       ws.send(WantPlayAI)
     }
 
+    def move(move: Move) {
+      game.move(move)
+      ws.send(PerformMove(move))
+    }
+
     g.addEventListener("keydown", (e: dom.KeyboardEvent) => {
       e.keyCode match {
-        case 37 => ws.send(PerformMove(Left))
-        case 38 => ws.send(PerformMove(Up))
-        case 39 => ws.send(PerformMove(Right))
-        case 40 => ws.send(PerformMove(Down))
+        case 37 => move(Left)
+        case 38 => move(Up)
+        case 40 => move(Down)
+        case 39 => move(Right)
         case _  =>
       }
       game.render()
     }, false)
-
-
 
   }
 }
