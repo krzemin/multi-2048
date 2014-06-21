@@ -15,7 +15,6 @@ object JSGame2048 extends js.JSApp {
 
   def main(): Unit = {
 
-    PicklerRegistry.register[String]
     PicklerRegistry.register[TestValue]
 
     val wsUri = "ws://localhost:9000/ws"

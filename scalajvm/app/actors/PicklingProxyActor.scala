@@ -14,7 +14,6 @@ object PicklingProxyActor {
 
 class PicklingProxyActor(out: ActorRef, proxiedProps: ActorRef => Props) extends Actor {
 
-  PicklerRegistry.register[String]
   PicklerRegistry.register[TestValue]
 
   val proxiedRef = context.actorOf(proxiedProps(self))
