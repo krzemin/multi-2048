@@ -1,5 +1,6 @@
 package game2048
 
+import game2048.Board.Move._
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 
 import scala.scalajs.js
@@ -15,25 +16,20 @@ object JSGame2048 extends js.JSApp {
 
   def main(): Unit = {
 
+    PicklerRegistry.register(WantPlayHuman)
+    PicklerRegistry.register(WantPlayAI)
+    PicklerRegistry.register[Board]
+    PicklerRegistry.register(None)
+    PicklerRegistry.register[Some[Any]]
+    PicklerRegistry.register(Nil)
+    PicklerRegistry.register[::[Any]]
+    PicklerRegistry.register[NewGame]
+    PicklerRegistry.register[StateUpdate]
+    PicklerRegistry.register[PerformMove]
     PicklerRegistry.register[TestValue]
 
     val wsUri = "ws://localhost:9000/ws"
     val websocket = new WebSocket(wsUri)
-
-    websocket.onmessage = (evt: MessageEvent) => {
-      println(evt.data)
-      val obj: js.Any = js.JSON.parse(evt.data.asInstanceOf[js.String]).asInstanceOf[js.Any]
-      val unpickle: Any = PicklerRegistry.unpickle(obj)
-      println(unpickle.asInstanceOf[TestValue])
-    }
-
-    websocket.onopen = { evt: Event =>
-      val msg = TestValue("to jest test string zagnieżdżony w TestValue")
-      val pickle: js.Any = PicklerRegistry.pickle(msg)
-      val pickleStr = js.JSON.stringify(pickle)
-      println(s"sending: $pickleStr")
-      websocket.send(pickleStr)
-    }
 
     val canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     canvas.style.margin = "0px auto"
@@ -96,6 +92,28 @@ object JSGame2048 extends js.JSApp {
           }
         }
       }
+    }
+
+    websocket.onmessage = (evt: MessageEvent) => {
+      println(evt.data)
+      val obj: js.Any = js.JSON.parse(evt.data.asInstanceOf[js.String]).asInstanceOf[js.Any]
+      val unpickle: Any = PicklerRegistry.unpickle(obj)
+      println(unpickle)
+      unpickle match {
+        case NewGame(size, board1, board2, imFirst) =>
+          game.board1 = board1
+          game.board2 = board2
+          game.render()
+
+      }
+    }
+
+    websocket.onopen = { evt: Event =>
+      val msg = TestValue("to jest test string zagnieżdżony w TestValue")
+      val pickle: js.Any = PicklerRegistry.pickle(msg)
+      val pickleStr = js.JSON.stringify(pickle)
+      println(s"sending: $pickleStr")
+      websocket.send(pickleStr)
     }
 
     game.render()

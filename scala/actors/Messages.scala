@@ -14,3 +14,5 @@ case class StateUpdate(status: Status, board1: Board, board2: Board)
 case class PerformMove(move: Move)
 
 case class TestValue(value: String)
+
+

@@ -7,14 +7,16 @@ import org.scalajs.spickling.playjson._
 import play.api.libs.json.JsValue
 
 object PicklingProxyActor {
-  def props(out: ActorRef, proxiedProps: ActorRef => Props) =
-    Props(new PicklingProxyActor(out, proxiedProps))
+  def props(out: ActorRef, pickleInit: () => Unit, proxiedProps: ActorRef => Props) =
+    Props(new PicklingProxyActor(out, pickleInit, proxiedProps))
 }
 
 
-class PicklingProxyActor(out: ActorRef, proxiedProps: ActorRef => Props) extends Actor {
+class PicklingProxyActor(out: ActorRef,
+                         pickleInit: () => Unit,
+                         proxiedProps: ActorRef => Props) extends Actor {
 
-  PicklerRegistry.register[TestValue]
+  pickleInit()
 
   val proxiedRef = context.actorOf(proxiedProps(self))
 
