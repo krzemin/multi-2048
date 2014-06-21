@@ -19,3 +19,8 @@ class WebSocketHelper(uri: String, receive: PartialFunction[Any, Unit]) {
     ws.onopen = (evt: Event) => code
   }
 }
+
+object WebSocketHelper {
+  def apply(uri: String)(receive: PartialFunction[Any, Unit]) =
+    new WebSocketHelper(uri, receive)
+}

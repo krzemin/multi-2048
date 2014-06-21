@@ -19,11 +19,6 @@ object JSGame2048 extends js.JSApp {
     val startButton = jQuery("<button>Start</button>").attr("disabled", "disabled")
     jQuery("body").append(startButton)
 
-    object WebSocketHelper {
-      def apply(uri: String)(receive: PartialFunction[Any, Unit]) =
-        new WebSocketHelper(uri, receive)
-    }
-
 
     val wsUri = "ws://localhost:9000/ws"
 
