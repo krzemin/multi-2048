@@ -10,46 +10,11 @@ import org.scalajs.dom
 import org.scalajs.dom.extensions._
 import js.Dynamic.{ global => g }
 
-import org.scalajs.spickling._
-import org.scalajs.spickling.jsany._
 import actors._
 
 object JSGame2048 extends js.JSApp {
 
   def main(): Unit = {
-
-    object PicklingHelper {
-      def registerTypes() {
-        PicklerRegistry.register(WantPlayHuman)
-        PicklerRegistry.register(WantPlayAI)
-        PicklerRegistry.register[Board]
-        PicklerRegistry.register(None)
-        PicklerRegistry.register[Some[Any]]
-        PicklerRegistry.register(Nil)
-        PicklerRegistry.register[::[Any]]
-        PicklerRegistry.register[NewGame]
-        PicklerRegistry.register(InProgress)
-        PicklerRegistry.register(Draw)
-        PicklerRegistry.register(Player1Won)
-        PicklerRegistry.register(Player2Won)
-        PicklerRegistry.register[StateUpdate]
-        PicklerRegistry.register(Left)
-        PicklerRegistry.register(Up)
-        PicklerRegistry.register(Right)
-        PicklerRegistry.register(Down)
-        PicklerRegistry.register[PerformMove]
-      }
-
-      def pickle(msg: Any): js.Any = {
-        val pickled: js.Any = PicklerRegistry.pickle(msg)
-        js.JSON.stringify(pickled)
-      }
-
-      def unpickle(buffer: Any): Any = {
-        val obj: js.Any = js.JSON.parse(buffer.asInstanceOf[js.String]).asInstanceOf[js.Any]
-        PicklerRegistry.unpickle(obj)
-      }
-    }
 
     class WebSocketHelper(uri: String, receive: PartialFunction[Any, Unit]) {
       val ws = new WebSocket(uri)
