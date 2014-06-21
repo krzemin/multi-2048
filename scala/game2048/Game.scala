@@ -2,7 +2,7 @@ package game2048
 
 class Game(size: Int) { self: Transformation with RandomGen with GameRenderer =>
 
-  import Game.Status._
+  import Game._
   import Board._
 
   require(size > 1)
@@ -56,9 +56,10 @@ class Game(size: Int) { self: Transformation with RandomGen with GameRenderer =>
 
 object Game {
 
-  object Status extends Enumeration {
-    type Status = Value
-    val InProgress, Draw, Player1Won, Player2Won = Value
-  }
+  sealed trait Status
+  case object InProgress extends Status
+  case object Draw extends Status
+  case object Player1Won extends Status
+  case object Player2Won extends Status
 
 }

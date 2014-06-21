@@ -4,7 +4,7 @@ import org.specs2.mutable._
 
 class GameSpec extends Specification {
 
-  import Game.Status._
+  import Game._
   import Board._
 
   "Game" should {

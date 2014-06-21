@@ -1,9 +1,11 @@
 package game2048
 
 import game2048.Board._
-import org.scalajs.dom.{Event, MessageEvent, WebSocket}
+import game2048.Game._
+import org.scalajs.dom.{MessageEvent, WebSocket}
 
 import scala.scalajs.js
+import org.scalajs.jquery._
 import org.scalajs.dom
 import org.scalajs.dom.extensions._
 import js.Dynamic.{ global => g }
@@ -26,6 +28,10 @@ object JSGame2048 extends js.JSApp {
         PicklerRegistry.register(Nil)
         PicklerRegistry.register[::[Any]]
         PicklerRegistry.register[NewGame]
+        PicklerRegistry.register(InProgress)
+        PicklerRegistry.register(Draw)
+        PicklerRegistry.register(Player1Won)
+        PicklerRegistry.register(Player2Won)
         PicklerRegistry.register[StateUpdate]
         PicklerRegistry.register(Left)
         PicklerRegistry.register(Up)
@@ -33,21 +39,39 @@ object JSGame2048 extends js.JSApp {
         PicklerRegistry.register(Down)
         PicklerRegistry.register[PerformMove]
       }
+
+      def pickle(msg: Any): js.Any = {
+        val pickled: js.Any = PicklerRegistry.pickle(msg)
+        js.JSON.stringify(pickled)
+      }
+
+      def unpickle(buffer: Any): Any = {
+        val obj: js.Any = js.JSON.parse(buffer.asInstanceOf[js.String]).asInstanceOf[js.Any]
+        PicklerRegistry.unpickle(obj)
+      }
     }
 
+    class WebSocketHelper(uri: String, receive: PartialFunction[Any, Unit]) {
+      val ws = new WebSocket(uri)
 
-    def pickle(msg: Any): js.Any = {
-      val pickled: js.Any = PicklerRegistry.pickle(msg)
-      js.JSON.stringify(pickled)
+      ws.onmessage = (evt: MessageEvent) => {
+        val msg: Any = PicklingHelper.unpickle(evt.data)
+        receive.applyOrElse(msg, (m: Any) => println(s"unhandled message: $m"))
+      }
+
+      def send(msg: Any) {
+        val buff = PicklingHelper.pickle(msg)
+        ws.send(buff)
+      }
     }
 
-    def unpickle(buffer: Any): Any = {
-      val obj: js.Any = js.JSON.parse(buffer.asInstanceOf[js.String]).asInstanceOf[js.Any]
-      PicklerRegistry.unpickle(obj)
+    object WebSocketHelper {
+      def apply(uri: String)(receive: PartialFunction[Any, Unit]) =
+        new WebSocketHelper(uri, receive)
     }
+
 
     val wsUri = "ws://localhost:9000/ws"
-    val websocket = new WebSocket(wsUri)
 
     val canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     canvas.style.margin = "0px auto"
@@ -79,7 +103,7 @@ object JSGame2048 extends js.JSApp {
         ctx.fillStyle = "rgb(20,60,150)"
         ctx.fillText(g.score1 + (" " * 30) + g.score2, canvas.width / 2, 408 + 12)
 
-        if(g.status != Game.Status.InProgress) {
+        if(g.status != Game.InProgress) {
           ctx.fillStyle = "rgb(220, 120, 20)"
           ctx.fillRect(canvas.width / 4, canvas.height / 4, canvas.width / 2, canvas.height / 2)
 
@@ -112,33 +136,38 @@ object JSGame2048 extends js.JSApp {
       }
     }
 
-    websocket.onopen = { evt: Event =>
-      val msg = pickle(WantPlayHuman)
-      websocket.send(msg)
-    }
+    PicklingHelper.registerTypes()
 
-    websocket.onmessage = (evt: MessageEvent) => {
-      println(evt.data)
-      unpickle(evt.data) match {
-        case NewGame(size, board1, board2, imFirst) =>
-          game.board1 = board1
-          game.board2 = board2
-          game.render()
-      }
+    val ws = WebSocketHelper(wsUri) {
+      case NewGame(size, board1, board2, imFirst) =>
+        game.board1 = board1
+        game.board2 = board2
+        game.render()
+      case StateUpdate(status, board1, board2) =>
+        game.board1 = board1
+        game.board2 = board2
+        game.render()
     }
 
     game.render()
 
     g.addEventListener("keydown", (e: dom.KeyboardEvent) => {
       e.keyCode match {
-        case 37 => game.move(Left)
-        case 38 => game.move(Up)
-        case 39 => game.move(Right)
-        case 40 => game.move(Down)
+        case 37 => ws.send(PerformMove(Left))
+        case 38 => ws.send(PerformMove(Up))
+        case 39 => ws.send(PerformMove(Right))
+        case 40 => ws.send(PerformMove(Down))
         case _  =>
       }
       game.render()
     }, false)
+
+    val startButton = jQuery("<button id=#start>Start</button>")
+    jQuery("body").append(startButton)
+
+    startButton click { _: JQueryEventObject =>
+      ws.send(WantPlayAI)
+    }
 
   }
 }
