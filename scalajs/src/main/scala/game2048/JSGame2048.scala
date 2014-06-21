@@ -2,7 +2,7 @@ package game2048
 
 import game2048.Board._
 import game2048.Game._
-import org.scalajs.dom.{MessageEvent, WebSocket}
+import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 
 import scala.scalajs.js
 import org.scalajs.jquery._
@@ -16,19 +16,8 @@ object JSGame2048 extends js.JSApp {
 
   def main(): Unit = {
 
-    class WebSocketHelper(uri: String, receive: PartialFunction[Any, Unit]) {
-      val ws = new WebSocket(uri)
-
-      ws.onmessage = (evt: MessageEvent) => {
-        val msg: Any = PicklingHelper.unpickle(evt.data)
-        receive.applyOrElse(msg, (m: Any) => println(s"unhandled message: $m"))
-      }
-
-      def send(msg: Any) {
-        val buff = PicklingHelper.pickle(msg)
-        ws.send(buff)
-      }
-    }
+    val startButton = jQuery("<button>Start</button>").attr("disabled", "disabled")
+    jQuery("body").append(startButton)
 
     object WebSocketHelper {
       def apply(uri: String)(receive: PartialFunction[Any, Unit]) =
@@ -114,7 +103,13 @@ object JSGame2048 extends js.JSApp {
         game.render()
     }
 
-    game.render()
+    ws.onConnect {
+      startButton.removeAttr("disabled")
+    }
+
+    startButton click { _: JQueryEventObject =>
+      ws.send(WantPlayAI)
+    }
 
     g.addEventListener("keydown", (e: dom.KeyboardEvent) => {
       e.keyCode match {
@@ -127,12 +122,7 @@ object JSGame2048 extends js.JSApp {
       game.render()
     }, false)
 
-    val startButton = jQuery("<button id=#start>Start</button>")
-    jQuery("body").append(startButton)
 
-    startButton click { _: JQueryEventObject =>
-      ws.send(WantPlayAI)
-    }
 
   }
 }
