@@ -14,7 +14,7 @@ object Application extends Controller {
   }
 
   def ws = WebSocket.acceptWithActor[JsValue,JsValue] { request => out =>
-    EchoActor.props(out)
+    PicklingProxyActor.props(out, EchoActor.props)
   }
 
 }
