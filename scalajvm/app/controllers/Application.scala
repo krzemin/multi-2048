@@ -15,7 +15,7 @@ object Application extends Controller {
   }
 
   def ws = WebSocket.acceptWithActor[JsValue,JsValue] { request => out =>
-    PicklingProxyActor.props(out, PicklingHelper.apply, PlayerManager.props)
+    PicklingProxyActor.props(out, PicklingHelper.registerTypes, PlayerManager.props)
   }
 
 }

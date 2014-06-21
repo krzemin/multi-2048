@@ -8,7 +8,7 @@ import org.scalajs.spickling._
 
 object PicklingHelper {
 
-  def apply(): Unit = {
+  def registerTypes(): Unit = {
     PicklerRegistry.register(WantPlayHuman)
     PicklerRegistry.register(WantPlayAI)
     PicklerRegistry.register[Board]
