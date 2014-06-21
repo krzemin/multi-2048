@@ -5,7 +5,7 @@ import org.specs2.mutable._
 class GameSpec extends Specification {
 
   import Game.Status._
-  import Board.Move._
+  import Board._
 
   "Game" should {
     "claim in-progress status for new game" in {

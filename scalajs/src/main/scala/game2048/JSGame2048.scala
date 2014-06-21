@@ -1,6 +1,6 @@
 package game2048
 
-import game2048.Board.Move._
+import game2048.Board._
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 
 import scala.scalajs.js
@@ -27,20 +27,23 @@ object JSGame2048 extends js.JSApp {
         PicklerRegistry.register[::[Any]]
         PicklerRegistry.register[NewGame]
         PicklerRegistry.register[StateUpdate]
-        PicklerRegistry.register[Move]
+        PicklerRegistry.register(Left)
+        PicklerRegistry.register(Up)
+        PicklerRegistry.register(Right)
+        PicklerRegistry.register(Down)
         PicklerRegistry.register[PerformMove]
       }
     }
 
 
-    def pickle(msg: Any): Any = {
+    def pickle(msg: Any): js.Any = {
       val pickled: js.Any = PicklerRegistry.pickle(msg)
       js.JSON.stringify(pickled)
     }
 
     def unpickle(buffer: Any): Any = {
       val obj: js.Any = js.JSON.parse(buffer.asInstanceOf[js.String]).asInstanceOf[js.Any]
-      PicklerRegistry.unpickle()
+      PicklerRegistry.unpickle(obj)
     }
 
     val wsUri = "ws://localhost:9000/ws"
@@ -109,32 +112,24 @@ object JSGame2048 extends js.JSApp {
       }
     }
 
+    websocket.onopen = { evt: Event =>
+      val msg = pickle(WantPlayHuman)
+      websocket.send(msg)
+    }
+
     websocket.onmessage = (evt: MessageEvent) => {
       println(evt.data)
-      val obj: js.Any = js.JSON.parse(evt.data.asInstanceOf[js.String]).asInstanceOf[js.Any]
-      val unpickle: Any = PicklerRegistry.unpickle(obj)
-      println(unpickle)
-      unpickle match {
+      unpickle(evt.data) match {
         case NewGame(size, board1, board2, imFirst) =>
           game.board1 = board1
           game.board2 = board2
           game.render()
-
       }
-    }
-
-    websocket.onopen = { evt: Event =>
-      val msg = TestValue("to jest test string zagnieżdżony w TestValue")
-      val pickle: js.Any = PicklerRegistry.pickle(msg)
-      val pickleStr = js.JSON.stringify(pickle)
-      println(s"sending: $pickleStr")
-      websocket.send(pickleStr)
     }
 
     game.render()
 
     g.addEventListener("keydown", (e: dom.KeyboardEvent) => {
-      import Board.Move._
       e.keyCode match {
         case 37 => game.move(Left)
         case 38 => game.move(Up)

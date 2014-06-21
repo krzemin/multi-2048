@@ -4,7 +4,6 @@ import game2048.Board
 import game2048.Board._
 import game2048.Game._
 import Status._
-import Move._
 
 case object WantPlayHuman
 case object WantPlayAI // not really supported yet

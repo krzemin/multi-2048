@@ -4,7 +4,6 @@ import scala.util.Random
 
 case class Board(size: Int, fields: List[List[Option[Int]]]) {
   import Board._
-  import Move._
 
   def isEmpty(x: Int, y: Int) = !fields(y)(x).isDefined
 
@@ -38,7 +37,7 @@ case class Board(size: Int, fields: List[List[Option[Int]]]) {
     if (newFields == fields) None else Some(new Board(size, newFields))
   }
 
-  def isStuck(t: Transformation): Boolean = Board.Move.values
+  def isStuck(t: Transformation): Boolean = Set(Left, Up, Right, Down)
     .map(move => performMove(t)(move))
     .forall(_ == None)
 
@@ -69,8 +68,10 @@ object Board {
     List.fill(first.size - rem.size)(None) ++ rem.reverse
   }
 
-  object Move extends Enumeration {
-    type Move = Value
-    val Left, Up, Right, Down = Value
-  }
+  sealed trait Move
+  case object Left extends Move
+  case object Up extends Move
+  case object Right extends Move
+  case object Down extends Move
+
 }

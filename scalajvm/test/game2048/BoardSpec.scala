@@ -7,7 +7,6 @@ class BoardSpec extends Specification {
   object RandomGenFake extends RandomGenFake
   object T2048 extends Transformation2048
   import Board._
-  import Move._
 
   val boardEmpty = Board(5)
   val boardFilled = Board(5, Some(1))

@@ -3,7 +3,7 @@ package game2048
 class Game(size: Int) { self: Transformation with RandomGen with GameRenderer =>
 
   import Game.Status._
-  import Board.Move._
+  import Board._
 
   require(size > 1)
 
@@ -29,7 +29,7 @@ class Game(size: Int) { self: Transformation with RandomGen with GameRenderer =>
   }
 
   def availableMoves: List[Move] =
-    Board.Move.values.toList
+    Set(Left, Up, Right, Down).toList
       .map(move => (move, board1.performMove(self)(move), board2.performMove(self)(move)))
       .filter(p => p._2.isDefined && p._3.isDefined)
       .map(_._1)
